@@ -22,8 +22,25 @@
   - [x] `pr` — PR 템플릿 자동 작성 + upstream master로 PR 생성
 - [x] `setup-check` — 개발환경 검증 (기존 스킬 적용)
 - [x] `agents/swagger` — Swagger 정리 에이전트 (기존 적용)
-- [ ] Jira 스킬 정의 (`.claude/skills/jira/`) — 추후
+- [x] Jira 스킬 정의 (`.claude/skills/jira/`)
+    - [x] `get-issue` — 티켓 조회
+    - [x] `my-issues` — 내 담당 티켓 목록
+    - [x] `analyze-issue` — 티켓 분석 + 댓글 작성
+    - [x] `create-issue` — 티켓 생성
+    - [x] `update-issue` — 티켓 수정/상태 전환
+    - [x] `comment` — 댓글 추가
+    - [x] `search-issues` — JQL 검색
 - [ ] Confluence 스킬 정의 (`.claude/skills/confluence/`) — 추후
+
+## Phase 2.5: FSC (Full Software Cycle) 스킬
+- [ ] `/fsc` 스킬 정의 (`.claude/skills/fsc/SKILL.md`)
+  - Input: Jira 티켓 ID
+  - Step 1: 티켓 분석 → 요구사항/설계문서를 티켓 댓글로 작성
+  - Step 2: 다중 Agent 검증 (요구사항/설계 리뷰) → 통과할 때까지 반복
+  - Step 3: Git 브랜치 생성 + 로컬 클론
+  - Step 4: 개발 수행
+  - Step 5: 다중 Agent 코드 리뷰/검증 → 통과할 때까지 반복
+  - Step 6: 커밋 + 푸시 + PR 생성
 
 ## Phase 3: MCP 서버 연동
 - [x] Google Calendar 연동 (claude.ai 내장)
