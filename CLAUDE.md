@@ -108,6 +108,17 @@ workspace/
 | `/comment <key> [text]` | Add comment to an issue |
 | `/search-issues <query>` | Search via JQL or natural language |
 
+### Confluence Skills
+| Skill | Description |
+|-------|-------------|
+| `/get-page <id or title>` | Retrieve page with content, comments, child pages |
+| `/analyze-page <id or title>` | Deep analysis: structure, quality, completeness + post as comment |
+| `/search-pages <query>` | Search via CQL or natural language |
+| `/create-page [title]` | Create new page (manual-only, requires confirmation) |
+| `/update-page <id> [instruction]` | Update page content, title, or status |
+| `/list-spaces [space-key]` | List spaces or pages in a space |
+| `/comment-page <id> [text]` | Add footer or inline comment |
+
 ### Utility Skills
 | Skill | Description |
 |-------|-------------|
@@ -124,11 +135,11 @@ Use the swagger agent when the user asks to polish Swagger documentation, refine
 
 | Server | Purpose | Skills that depend on it |
 |--------|---------|--------------------------|
-| Atlassian MCP | Jira/Confluence API access | All `/jira/*` skills |
+| Atlassian MCP | Jira/Confluence API access | All `/jira/*` and `/confluence/*` skills |
 | GitHub (gh CLI) | GitHub API access | All `/github/*` skills |
 
 - Atlassian MCP config: `.mcp.json` (HTTP transport, `https://mcp.atlassian.com/v1/mcp`)
-- If Atlassian MCP is disconnected, Jira skills will not function. Run `/setup-check` or reconnect via `/mcp`.
+- If Atlassian MCP is disconnected, Jira and Confluence skills will not function. Run `/setup-check` or reconnect via `/mcp`.
 - GitHub access uses `gh` CLI (not MCP). Requires `gh auth login` with scopes: `repo`, `read:org`, `workflow`.
 
 ## Knowledge Auto-Collection

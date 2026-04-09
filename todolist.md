@@ -30,7 +30,14 @@
     - [x] `update-issue` — 티켓 수정/상태 전환
     - [x] `comment` — 댓글 추가
     - [x] `search-issues` — JQL 검색
-- [ ] Confluence 스킬 정의 (`.claude/skills/confluence/`) — 추후
+- [x] Confluence 스킬 정의 (`.claude/skills/confluence/`)
+    - [x] `get-page` — 페이지 조회
+    - [x] `analyze-page` — 페이지 분석 + 댓글 작성
+    - [x] `search-pages` — CQL/자연어 검색
+    - [x] `create-page` — 페이지 생성
+    - [x] `update-page` — 페이지 수정
+    - [x] `list-spaces` — Space 목록 조회
+    - [x] `comment-page` — 댓글 추가
 
 ## Phase 2.5: FSC (Full Software Cycle) 스킬
 - [ ] `/fsc` 스킬 정의 (`.claude/skills/fsc/SKILL.md`)
