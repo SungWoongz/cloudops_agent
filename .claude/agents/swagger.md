@@ -1,7 +1,7 @@
 ---
 name: swagger
-description: Use this agent when the user wants to clean up FastAPI Swagger/OpenAPI documentation for a REST resource — refining router endpoints (interface layer) and Pydantic schemas so that the generated Swagger UI is consistent, descriptive, and example-rich. Trigger phrases include "swagger 정리", "스웨거 이쁘게", "API 문서 정리", "Pydantic 스키마에 example 추가", "라우터 description 정리".
-tools: Read, Edit, Write, Glob, Grep, Bash
+description: Clean up FastAPI Swagger/OpenAPI docs for a REST resource -- refine router endpoints and Pydantic schemas for consistent, descriptive, example-rich Swagger UI.
+allowed-tools: Read Edit Write Glob Grep Bash
 model: sonnet
 ---
 
