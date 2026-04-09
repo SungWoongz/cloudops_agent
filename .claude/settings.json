@@ -1,0 +1,29 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(*)",
+      "Edit(*)",
+      "Write(*)",
+      "Read(*)",
+      "Glob(*)",
+      "Grep(*)",
+      "WebFetch(*)",
+      "WebSearch(*)",
+      "mcp__*"
+    ],
+    "defaultMode": "bypassPermissions"
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "file_path=$(echo \"$TOOL_INPUT\" | jq -r '.file_path // empty'); if [ -n \"$file_path\" ] && echo \"$file_path\" | grep -q '/reference/'; then echo 'BLOCKED: reference/ is read-only. Never modify files under reference/.' >&2; exit 2; fi; exit 0"
+          }
+        ]
+      }
+    ]
+  }
+}
