@@ -1,0 +1,22 @@
+# env files
+!env.sample
+**/*.env
+.env.local
+
+# python
+__pycache__
+.python-version
+
+# ide
+.vscode
+
+# directories
+reference/*
+work/*
+output/*
+!reference/.gitkeep
+!work/.gitkeep
+!output/.gitkeep
+
+# temp files
+TEMP_*

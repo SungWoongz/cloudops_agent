@@ -27,6 +27,11 @@ Expert AI Agent for the CloudOps multi-cloud management platform development.
 - No exceptions — even for minor changes.
 - Exception: If the user explicitly instructs to write without discussion, proceed immediately.
 
+### 4. External Document Rule
+- When asked to read an external document (Confluence, Jira, etc.), ALWAYS make a fresh API call. Never rely on previously cached content.
+- After reading, explicitly state the version/timestamp to confirm freshness.
+- If the document was read before in the same session, compare and report what changed before giving feedback.
+
 ## Project Directory Structure
 
 ```
@@ -69,16 +74,17 @@ workspace/
 - Always branch from `master` (upstream default branch).
 - Never commit directly to `master`.
 
-**Commit message format:**
+**Commit message format (Conventional Commits -- enforced by hook):**
 ```
-<type>: <subject>
+<type>(<optional scope>): <description>
 
 <body>
 ```
-- Type: `feat`, `fix`, `refactor`, `docs`, `test`, `chore`, `style`
-- Subject: Korean, max 50 chars, no period, imperative mood
+- Types: `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `build`, `ci`, `chore`, `revert`
+- Description: Korean, max 50 chars, no period, imperative mood
 - Body: Korean, wrap at 72 chars, explain *why* not *what*, 2-5 lines with `-` bullets
 - Technical terms (API, CI/CD, file paths) stay as-is in Korean text
+- Reference: https://www.conventionalcommits.org
 
 ### Jira Conventions
 - Before starting work on a ticket, run `/get-issue <key>` to confirm the latest state.
@@ -119,6 +125,11 @@ workspace/
 | `/list-spaces [space-key]` | List spaces or pages in a space |
 | `/comment-page <id> [text]` | Add footer or inline comment |
 
+### AWS Skills
+| Skill | Description |
+|-------|-------------|
+| `/code-artifact-login` | Authenticate pip against AWS CodeArtifact (12h token) |
+
 ### Utility Skills
 | Skill | Description |
 |-------|-------------|
@@ -141,6 +152,46 @@ Use the swagger agent when the user asks to polish Swagger documentation, refine
 - Atlassian MCP config: `.mcp.json` (HTTP transport, `https://mcp.atlassian.com/v1/mcp`)
 - If Atlassian MCP is disconnected, Jira and Confluence skills will not function. Run `/setup-check` or reconnect via `/mcp`.
 - GitHub access uses `gh` CLI (not MCP). Requires `gh auth login` with scopes: `repo`, `read:org`, `workflow`.
+
+## Hooks (Automated Quality Gates)
+
+Hooks run automatically and enforce quality standards without manual intervention.
+
+### SessionStart
+- **`.env.local` auto-loader**: Reads `.env.local` and injects `KEY=VALUE` pairs as environment variables into the Claude Code session. Required for AWS/CodeArtifact skills.
+
+### PreToolUse
+| Hook | Trigger | Action |
+|------|---------|--------|
+| `reference/` guard | Edit/Write | Blocks any modification to files under `reference/` |
+| `conventional-commit.py` | `git commit -m` | Enforces Conventional Commits format: `<type>(<scope>): <description>` |
+
+### PostToolUse
+| Hook | Trigger | Action |
+|------|---------|--------|
+| `ruff-format-lint.sh` | Edit/Write on `.py` files | Auto-formats with ruff, then checks lint -- blocks on remaining errors |
+| `check-3layer.py` | Edit/Write on `.py` files | AST-based 3-layer architecture enforcement (interface -> service -> manager) |
+
+### Hook Exit Code Convention
+| Code | Meaning | Claude behavior |
+|------|---------|-----------------|
+| 0 | Pass | Proceed normally |
+| 1 | Environment error (tool missing) | Non-blocking warning |
+| 2 | Violation detected | **Blocks the action** -- Claude must fix and retry |
+
+### 3-Layer Architecture Rules
+```
+interface (REST router)  ->  service (business logic)  ->  manager (data access)
+```
+- `manager/` must NOT import from `service/` or `interface/`
+- `service/` must NOT import from `interface/`
+- `interface/` must NOT import from `manager/` (must go via service)
+
+## Environment Setup
+
+- Copy `env.sample` to `.env.local` and fill in actual values.
+- `.env.local` is git-ignored and auto-loaded on session start.
+- Run `/code-artifact-login` to authenticate pip against AWS CodeArtifact (required for installing private packages).
 
 ## Knowledge Auto-Collection
 - When discovering new information about a CloudOps service during any work (coding, analysis, review), automatically save it to `.claude/rules/cloudops/{service-name}.md`.

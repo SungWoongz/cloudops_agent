@@ -68,9 +68,16 @@
 
 ## Phase 5: Hooks 설정
 - [x] PreToolUse — reference/ 수정 강제 차단 (Edit/Write)
+- [x] PreToolUse — conventional-commit.py (Conventional Commits 강제)
+- [x] PostToolUse — ruff-format-lint.sh (.py 자동 포맷/린트)
+- [x] PostToolUse — check-3layer.py (3레이어 아키텍처 import 위반 차단)
+- [x] SessionStart — .env.local 환경변수 자동 주입
 - [ ] Notification — Claude 대기 시 macOS 알림 (추후)
-- [ ] SessionStart — 세션 시작 시 컨텍스트 자동 주입 (추후)
+- [ ] PostToolUse — run-tests.py 편집 파일 기반 자동 테스트 (추후)
 
 ## Phase 6: 권한/환경 설정
-- [ ] 허용 명령어 설정
-- [ ] 환경변수 설정
+- [x] env.sample 생성 + .gitignore 설정
+- [x] .env.local 자동 로드 (SessionStart hook)
+- [x] `/code-artifact-login` 스킬 — AWS CodeArtifact pip 인증
+- [ ] 허용 명령어 세부 설정 (추후)
+- [ ] 환경변수 세부 설정 (추후)

@@ -11,9 +11,24 @@
       "WebSearch(*)",
       "mcp__*"
     ],
+    "deny": [
+      "Read(./**/.env)",
+      "Read(./**/.env.*)"
+    ],
     "defaultMode": "bypassPermissions"
   },
   "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "if [ -n \"${CLAUDE_ENV_FILE-}\" ] && [ -f \"${CLAUDE_PROJECT_DIR}/.env.local\" ]; then grep -E '^[A-Za-z_][A-Za-z0-9_]*=' \"${CLAUDE_PROJECT_DIR}/.env.local\" | sed 's/^/export /' >> \"$CLAUDE_ENV_FILE\"; fi; exit 0"
+          }
+        ]
+      }
+    ],
     "PreToolUse": [
       {
         "matcher": "Edit|Write",
@@ -21,6 +36,33 @@
           {
             "type": "command",
             "command": "file_path=$(echo \"$TOOL_INPUT\" | jq -r '.file_path // empty'); if [ -n \"$file_path\" ] && echo \"$file_path\" | grep -q '/reference/'; then echo 'BLOCKED: reference/ is read-only. Never modify files under reference/.' >&2; exit 2; fi; exit 0"
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/conventional-commit.py",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/ruff-format-lint.sh",
+            "timeout": 60
+          },
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/check-3layer.py",
+            "timeout": 30
           }
         ]
       }
