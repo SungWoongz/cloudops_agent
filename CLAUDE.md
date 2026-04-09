@@ -27,14 +27,113 @@ Expert AI Agent for the CloudOps multi-cloud management platform development.
 - No exceptions — even for minor changes.
 - Exception: If the user explicitly instructs to write without discussion, proceed immediately.
 
+## Project Directory Structure
+
+```
+workspace/
+  reference/          # Read-only upstream clones (NEVER modify)
+    cores/            # Repos tagged with "core" topic
+    plugins/          # Repos tagged with "plugin" topic
+    others/           # Repos without core/plugin topic
+  work/               # Working copies (forked repos, feature branches)
+    <repo-name>/      # Cloned fork with active branch
+  .claude/
+    agents/           # Subagent definitions (e.g., swagger)
+    skills/           # Slash command skills
+      github/         # Git/GitHub workflow skills
+      jira/           # Jira integration skills
+      setup-check/    # Dev environment verification
+    rules/            # Auto-collected knowledge base
+      cloudops/       # Per-service knowledge files
+    settings.json     # Project-level permissions and hooks
+```
+
+- **`reference/`**: Cloned via `/get-repo`. Strictly read-only -- for analysis and code review only.
+- **`work/`**: Cloned via `/create-branch`. Active development happens here.
+
 ## Workflow Rules
+
+### General
 - Always run `/sync-fork` before starting any work (coding, analysis, review, or git operations).
 - Run `/setup-check` when setting up a new project or encountering environment issues.
 - **NEVER modify any files under `reference/`.** This directory is strictly read-only for analysis and code review.
 
+### Git Conventions
+
+**Branch naming:**
+```
+<type>/TPM-<number>-<short-description>
+```
+- Types: `feat`, `fix`, `refactor`, `docs`, `test`, `chore`
+- Example: `feat/TPM-123-user-auth-api`, `fix/TPM-456-login-redirect`
+- Always branch from `master` (upstream default branch).
+- Never commit directly to `master`.
+
+**Commit message format:**
+```
+<type>: <subject>
+
+<body>
+```
+- Type: `feat`, `fix`, `refactor`, `docs`, `test`, `chore`, `style`
+- Subject: Korean, max 50 chars, no period, imperative mood
+- Body: Korean, wrap at 72 chars, explain *why* not *what*, 2-5 lines with `-` bullets
+- Technical terms (API, CI/CD, file paths) stay as-is in Korean text
+
+### Jira Conventions
+- Before starting work on a ticket, run `/get-issue <key>` to confirm the latest state.
+- Status transitions require explicit user confirmation.
+- All comments and analysis results posted to Jira must be in Korean.
+- When Atlassian MCP is disconnected, inform the user and suggest reconnecting via `/setup-check` or `/mcp`.
+
+## Available Skills
+
+### GitHub Skills
+| Skill | Description |
+|-------|-------------|
+| `/get-repo <name>` | Clone upstream repo into `reference/` (read-only) |
+| `/create-branch <repo> <branch>` | Fork + clone + sync + create branch in `work/` |
+| `/sync-fork` | Sync `reference/` and `work/` with upstream |
+| `/commit-push [message]` | Diff analysis + auto commit message + push |
+| `/pr` | Auto-generate PR template + create PR to upstream |
+
+### Jira Skills
+| Skill | Description |
+|-------|-------------|
+| `/get-issue <key>` | Retrieve issue with full details, comments, links |
+| `/my-issues [status]` | List issues assigned to me (filter: todo/progress/done/all) |
+| `/analyze-issue <key>` | Deep analysis: requirements, scope, risks + post as comment |
+| `/create-issue [summary]` | Create new issue (manual-only, requires confirmation) |
+| `/update-issue <key> [action]` | Update fields or transition status |
+| `/comment <key> [text]` | Add comment to an issue |
+| `/search-issues <query>` | Search via JQL or natural language |
+
+### Utility Skills
+| Skill | Description |
+|-------|-------------|
+| `/setup-check` | Verify dev environment (Python 3.10, gh, ruff, Atlassian MCP) |
+
+### Agents
+| Agent | Description |
+|-------|-------------|
+| `swagger` | Clean up FastAPI Swagger/OpenAPI docs for a REST resource (router + Pydantic schemas) |
+
+Use the swagger agent when the user asks to polish Swagger documentation, refine API descriptions, or add examples to Pydantic schemas.
+
+## MCP Server Dependencies
+
+| Server | Purpose | Skills that depend on it |
+|--------|---------|--------------------------|
+| Atlassian MCP | Jira/Confluence API access | All `/jira/*` skills |
+| GitHub (gh CLI) | GitHub API access | All `/github/*` skills |
+
+- Atlassian MCP config: `.mcp.json` (HTTP transport, `https://mcp.atlassian.com/v1/mcp`)
+- If Atlassian MCP is disconnected, Jira skills will not function. Run `/setup-check` or reconnect via `/mcp`.
+- GitHub access uses `gh` CLI (not MCP). Requires `gh auth login` with scopes: `repo`, `read:org`, `workflow`.
+
 ## Knowledge Auto-Collection
 - When discovering new information about a CloudOps service during any work (coding, analysis, review), automatically save it to `.claude/rules/cloudops/{service-name}.md`.
-- This is an exception to the "Always Discuss Before Execution" rule — no confirmation needed for knowledge collection.
+- This is an exception to the "Always Discuss Before Execution" rule -- no confirmation needed for knowledge collection.
 - Use path-scoped frontmatter so the knowledge loads only when working on that service.
 - Update existing files if the service already has a knowledge file. Do not create duplicates.
 
